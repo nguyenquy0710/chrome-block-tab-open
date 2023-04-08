@@ -1,6 +1,7 @@
 {
     "name": "NQDEV Block Tab Open",
     "version": "1.0",
+    "description": "Ứng dụng sẽ chặn mở tabs từ một số trang như: hhpanda.tv, ...",
     "manifest_version": 3,
     "background": {
         "service_worker": "background.js"
