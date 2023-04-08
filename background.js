@@ -1,4 +1,5 @@
-let blacklist = ['.*hhpanda\.tv.*'];
+let targetUrl = 'https://blogs.nhquydev.net/?utm_source=chrome&utm_medium=extension&utm_campaign=block-opening-tabs',
+    blacklist = ['.*hhpanda\.tv.*'];
 
 chrome.runtime.onInstalled.addListener(function () {
     chrome.storage.sync.set({ 'blacklist': blacklist }, function () {
@@ -38,7 +39,7 @@ chrome.tabs.onCreated.addListener(function (tab) {
                     isBlocked = true;
                     // Remove the tab
                     // chrome.tabs.remove(tab.id);
-                    chrome.tabs.update(tab.id, { active: true, url: 'chrome://newtab/' });
+                    chrome.tabs.update(tab.id, { active: true, url: targetUrl });
                     return;
                 }
             });
@@ -55,7 +56,7 @@ chrome.tabs.onCreated.addListener(function (tab) {
                 isBlocked = true;
                 // Remove the tab
                 // chrome.tabs.remove(tab.id);
-                chrome.tabs.update(tab.id, { active: true, url: 'chrome://newtab/' });
+                chrome.tabs.update(tab.id, { active: true, url: targetUrl });
                 return;
             }
         });
