@@ -1,5 +1,9 @@
 let targetUrl = 'https://blogs.nhquydev.net/?utm_source=chrome&utm_medium=extension&utm_campaign=block-opening-tabs',
-    blacklist = ['.*hhpanda\.tv.*', '.*hh3dhay\.com.*'];
+    blacklist = [
+        '.*hhpanda\.tv.*',
+        '.*hh3dhay\.com.*',
+        '.*hhhkungfu\.tv.*',
+    ];
 
 chrome.runtime.onInstalled.addListener(function () {
     chrome.storage.sync.set({ 'blacklist': blacklist }, function () {
