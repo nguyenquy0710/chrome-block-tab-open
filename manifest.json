@@ -1,6 +1,6 @@
 {
     "name": "NQDEV Block Tab Open",
-    "version": "1.1.0",
+    "version": "1.0.1",
     "description": "Ứng dụng sẽ chặn mở tabs từ một số trang như: hhpanda.tv, hh3dhay.com, hhhkungfu.tv, ...",
     "manifest_version": 3,
     "background": {
