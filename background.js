@@ -1,12 +1,19 @@
 let targetUrl = 'https://blogs.nhquydev.net/?utm_source=chrome&utm_medium=extension&utm_campaign=block-opening-tabs',
-    blacklist = [
+    blackList = [
         '.*hhpanda\.tv.*',
         '.*hh3dhay\.com.*',
         '.*hhhkungfu\.tv.*',
+    ], targetList = [
+        'https://blogs.nhquydev.net',
+        "https://blogs.nhquydev.net/v/.net-basic/",
+        "https://blogs.nhquydev.net/v/sql-basic/",
+        "https://blogs.nhquydev.net/v/cheatsheet/",
+        "https://blogs.nhquydev.net/v/dinh-duong-cho-it/",
+        "https://blogs.nhquydev.net/v/lien-he/",
     ];
 
 chrome.runtime.onInstalled.addListener(function () {
-    chrome.storage.sync.set({ 'blacklist': blacklist }, function () {
+    chrome.storage.sync.set({ 'blacklist': blackList }, function () {
         console.log('Blacklist initialized!');
     });
 });
@@ -17,7 +24,7 @@ chrome.runtime.onStartup.addListener(function () {
 
 // Listen for new tabs being created
 chrome.tabs.onCreated.addListener(function (tab) {
-    // console.log(JSON.stringify(tab));
+    console.log(JSON.stringify(tab));
 
     let windowId = tab.windowId;
     chrome.tabs.query({ windowId: windowId }, function (tabs) {
@@ -43,7 +50,7 @@ chrome.tabs.onCreated.addListener(function (tab) {
                     isBlocked = true;
                     // Remove the tab
                     // chrome.tabs.remove(tab.id);
-                    chrome.tabs.update(tab.id, { active: true, url: targetUrl });
+                    chrome.tabs.update(tab.id, { active: true, url: `${targetUrl}&previous_url=${encodeURIComponent(previousTab?.url)}&pending_url=${encodeURIComponent(tab?.pendingUrl)}` });
                     return;
                 }
             });
