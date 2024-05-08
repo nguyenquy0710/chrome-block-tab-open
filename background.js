@@ -3,13 +3,10 @@ let targetUrl = 'https://blogs.nhquydev.net/?utm_source=chrome&utm_medium=extens
         '.*hhpanda\.tv.*',
         '.*hh3dhay\.com.*',
         '.*hhhkungfu\.tv.*',
+        '.*hoathinh3d\.fun.*',
+        '.*hoathinh3d.*',
     ], targetList = [
         'https://blogs.nhquydev.net',
-        "https://blogs.nhquydev.net/v/.net-basic/",
-        "https://blogs.nhquydev.net/v/sql-basic/",
-        "https://blogs.nhquydev.net/v/cheatsheet/",
-        "https://blogs.nhquydev.net/v/dinh-duong-cho-it/",
-        "https://blogs.nhquydev.net/v/lien-he/",
     ];
 
 chrome.runtime.onInstalled.addListener(function () {
@@ -26,27 +23,50 @@ chrome.runtime.onStartup.addListener(function () {
 chrome.tabs.onCreated.addListener(function (tab) {
     console.log(JSON.stringify(tab));
 
-    let windowId = tab.windowId;
-    chrome.tabs.query({ windowId: windowId }, function (tabs) {
-        // console.log(JSON.stringify(tabs));
+    let isByPass = false,
+        windowId = tab.windowId,
+        pendingUrl = tab.windowId;
 
-        let previousTab = null;
-        for (let i = 0; i < tabs.length; i++) {
-            if (tabs[i].id === tab.id) {
-                if (i > 0) {
-                    previousTab = tabs[i - 1];
+    isByPass = pendingUrl == 'chrome://newtab/';
+
+    if (!isByPass) {
+        chrome.tabs.query({ windowId: windowId }, function (tabs) {
+            // console.log(JSON.stringify(tabs));
+
+            let previousTab = null;
+            for (let i = 0; i < tabs.length; i++) {
+                if (tabs[i].id === tab.id) {
+                    if (i > 0) {
+                        previousTab = tabs[i - 1];
+                    }
+                    break;
                 }
-                break;
             }
-        }
-        console.log(previousTab); // previous tab object or null
+            console.log("🚀 Nqdev: previousTab", previousTab); // previous tab object or null
+
+            chrome.storage.sync.get(['blacklist'], function (result) {
+                // Check if the new tab is on a blocked URL
+                let isBlocked = false;
+                result.blacklist.forEach(pattern => {
+                    let regex = new RegExp(pattern);
+                    if (regex.test(previousTab?.url)) {
+                        isBlocked = true;
+                        // Remove the tab
+                        // chrome.tabs.remove(tab.id);
+                        chrome.tabs.update(tab.id, { active: true, url: `${targetUrl}&previous_url=${encodeURIComponent(previousTab?.url)}&pending_url=${encodeURIComponent(tab?.pendingUrl)}` });
+                        return;
+                    }
+                });
+                console.log(`previousTab: ${isBlocked} -> previousTab.url: ${previousTab?.url}`); // true or false
+            });
+        });
 
         chrome.storage.sync.get(['blacklist'], function (result) {
             // Check if the new tab is on a blocked URL
             let isBlocked = false;
             result.blacklist.forEach(pattern => {
                 let regex = new RegExp(pattern);
-                if (regex.test(previousTab?.url)) {
+                if (regex.test(tab?.pendingUrl) || regex.test(tab?.url)) {
                     isBlocked = true;
                     // Remove the tab
                     // chrome.tabs.remove(tab.id);
@@ -54,25 +74,9 @@ chrome.tabs.onCreated.addListener(function (tab) {
                     return;
                 }
             });
-            console.log(`previousTab: ${isBlocked} -> previousTab.url: ${previousTab?.url}`); // true or false
+            console.log(`current: ${isBlocked} -> tab.pendingUrl: ${tab?.pendingUrl} -> tab.url: ${tab?.url}`); // true or false
         });
-    });
-
-    chrome.storage.sync.get(['blacklist'], function (result) {
-        // Check if the new tab is on a blocked URL
-        let isBlocked = false;
-        result.blacklist.forEach(pattern => {
-            let regex = new RegExp(pattern);
-            if (regex.test(tab?.pendingUrl) || regex.test(tab?.url)) {
-                isBlocked = true;
-                // Remove the tab
-                // chrome.tabs.remove(tab.id);
-                chrome.tabs.update(tab.id, { active: true, url: targetUrl });
-                return;
-            }
-        });
-        console.log(`current: ${isBlocked} -> tab.pendingUrl: ${tab?.pendingUrl} -> tab.url: ${tab?.url}`); // true or false
-    });
+    }
 });
 
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
